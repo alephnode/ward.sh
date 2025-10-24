@@ -1,0 +1,160 @@
+/* Hero variant - vertical centered layout */
+.heroContainer {
+  max-width: 800px;
+  margin: 0 auto;
+  width: 100%;
+  text-align: center;
+}
+
+.heroContainer .logo {
+  font-size: 2.5rem;
+  font-weight: 300;
+  letter-spacing: -0.02em;
+  margin-bottom: 4rem;
+  line-height: 1;
+  cursor: pointer;
+  transition: opacity 0.2s ease;
+}
+
+.heroContainer .logo:hover {
+  opacity: 0.7;
+}
+
+.heroContainer .nav {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  align-items: center;
+}
+
+/* Header variant - horizontal header layout */
+.headerContainer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 2rem 3rem;
+  max-width: 1400px;
+  width: 100%;
+  margin: 0 auto;
+}
+
+.headerContainer .logo {
+  font-size: 1.5rem;
+  font-weight: 300;
+  letter-spacing: -0.02em;
+  line-height: 1;
+  cursor: pointer;
+  transition: opacity 0.2s ease;
+}
+
+.headerContainer .logo:hover {
+  opacity: 0.7;
+}
+
+.headerContainer .nav {
+  display: flex;
+  flex-direction: row;
+  gap: 2rem;
+  align-items: center;
+}
+
+/* Common styles */
+.logo {
+  font-size: 1.5rem;
+  font-weight: 300;
+  letter-spacing: -0.02em;
+  line-height: 1;
+  cursor: pointer;
+  transition: opacity 0.2s ease;
+}
+
+.ward {
+  color: #666666;
+  font-weight: 200;
+}
+
+.sh {
+  color: #333333;
+  font-weight: 300;
+}
+
+.navLink {
+  color: var(--foreground);
+  text-decoration: none;
+  font-size: 0.75rem;
+  font-weight: 400;
+  letter-spacing: 0.01em;
+  transition: color 0.2s ease;
+  position: relative;
+}
+
+.navLink:hover {
+  color: var(--text-muted);
+  text-decoration: none;
+}
+
+.navLink::after {
+  content: '';
+  position: absolute;
+  bottom: -2px;
+  left: 0;
+  width: 0;
+  height: 1px;
+  background: var(--foreground);
+  transition: width 0.3s ease;
+}
+
+.navLink:hover::after {
+  width: 100%;
+}
+
+.navLinkActive {
+  color: var(--text-muted);
+}
+
+.navLinkActive::after {
+  width: 100%;
+}
+
+/* Mobile responsive */
+@media (max-width: 768px) {
+  .heroContainer .logo {
+    font-size: 2rem;
+    margin-bottom: 3rem;
+  }
+  
+  .heroContainer .nav {
+    gap: 0.75rem;
+  }
+
+  .headerContainer {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 1.5rem;
+    padding: 1.5rem 2rem;
+  }
+  
+  .headerContainer .logo {
+    font-size: 1.25rem;
+  }
+  
+  .headerContainer .nav {
+    gap: 1.5rem;
+  }
+  
+  .navLink {
+    font-size: 0.7rem;
+  }
+}
+
+/* Dark mode */
+@media (prefers-color-scheme: dark) {
+  .ward {
+    color: #999999;
+  }
+  
+  .sh {
+    color: #cccccc;
+  }
+}
+
