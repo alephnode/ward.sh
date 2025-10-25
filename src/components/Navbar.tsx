@@ -34,18 +34,18 @@ export default function Navbar({ variant = 'header', activePage = null }: Navbar
           </TransitionLink>
         )}
         {activePage === 'visual' ? (
-          <TransitionLink href="/visual" className={`${styles.navLink} ${styles.navLinkActive}`}>
+          <span className={`${styles.navLink} ${styles.navLinkActive}`}>
             visual
-          </TransitionLink>
+          </span>
         ) : (
           <TransitionLink href="/visual" className={styles.navLink}>
             visual
           </TransitionLink>
         )}
         {activePage === 'audible' ? (
-          <TransitionLink href="/audible" className={`${styles.navLink} ${styles.navLinkActive}`}>
+          <span className={`${styles.navLink} ${styles.navLinkActive}`}>
             audible
-          </TransitionLink>
+          </span>
         ) : (
           <TransitionLink href="/audible" className={styles.navLink}>
             audible

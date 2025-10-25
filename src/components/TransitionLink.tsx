@@ -1,7 +1,7 @@
 'use client';
 
 import { useRouter } from 'next/navigation';
-import { MouseEvent } from 'react';
+import { MouseEvent, useState } from 'react';
 
 interface TransitionLinkProps {
   href: string;
@@ -12,21 +12,49 @@ interface TransitionLinkProps {
 
 export default function TransitionLink({ href, className, style, children }: TransitionLinkProps) {
   const router = useRouter();
+  const [isNavigating, setIsNavigating] = useState(false);
 
   const handleClick = (e: MouseEvent<HTMLAnchorElement>) => {
     e.preventDefault();
+    
+    if (isNavigating) return;
+    setIsNavigating(true);
 
-    // Fade out
-    document.body.style.opacity = '0';
-    document.body.style.transition = 'opacity 0.4s ease-in-out';
+    // Create overlay for smooth transition
+    const overlay = document.createElement('div');
+    overlay.style.position = 'fixed';
+    overlay.style.top = '0';
+    overlay.style.left = '0';
+    overlay.style.width = '100%';
+    overlay.style.height = '100%';
+    overlay.style.backgroundColor = 'var(--background, #000)';
+    overlay.style.opacity = '0';
+    overlay.style.transition = 'opacity 0.4s ease-in-out';
+    overlay.style.zIndex = '9999';
+    overlay.style.pointerEvents = 'none';
+    document.body.appendChild(overlay);
 
-    // Navigate after fade out
+    // Trigger fade to dark
+    requestAnimationFrame(() => {
+      overlay.style.opacity = '1';
+    });
+
+    // Navigate after fade completes
     setTimeout(() => {
       router.push(href);
-      // Reset for fade in
+      
+      // Keep the overlay dark for longer to allow new content to render
+      // This works with TransitionProvider's 150ms delay
       setTimeout(() => {
-        document.body.style.opacity = '1';
-      }, 50);
+        overlay.style.opacity = '0';
+        // Remove overlay after fade-out completes
+        setTimeout(() => {
+          if (document.body.contains(overlay)) {
+            document.body.removeChild(overlay);
+          }
+          setIsNavigating(false);
+        }, 500);
+      }, 200);
     }, 400);
   };
 
