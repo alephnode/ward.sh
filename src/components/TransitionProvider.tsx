@@ -1,6 +1,6 @@
 'use client';
 
-import { createContext, useContext, useState, useEffect } from 'react';
+import { createContext, useContext, useState, useEffect, useRef } from 'react';
 import { usePathname } from 'next/navigation';
 
 interface TransitionContextType {
@@ -14,17 +14,25 @@ export function TransitionProvider({ children }: { children: React.ReactNode }) 
   const [isTransitioning, setIsTransitioning] = useState(false);
   const [displayContent, setDisplayContent] = useState(true);
   const pathname = usePathname();
+  const previousPathname = useRef(pathname);
 
   useEffect(() => {
-    // When pathname changes, hide content immediately
+    // Only trigger transition if pathname actually changed
+    if (previousPathname.current === pathname) {
+      return;
+    }
+    
+    previousPathname.current = pathname;
+    
+    // Hide content briefly to allow new content to render
     setIsTransitioning(false);
     setDisplayContent(false);
     
-    // Wait for content to render, then fade in
-    // This delay ensures the new content is mounted before we show it
+    // Show content after a brief delay
+    // This works in coordination with TransitionLink's overlay timing
     const timer = setTimeout(() => {
       setDisplayContent(true);
-    }, 150);
+    }, 50);
     
     return () => clearTimeout(timer);
   }, [pathname]);
@@ -38,7 +46,7 @@ export function TransitionProvider({ children }: { children: React.ReactNode }) 
       <div 
         style={{
           opacity: displayContent ? 1 : 0,
-          transition: 'opacity 0.5s ease-in-out',
+          transition: 'opacity 0.3s ease-in-out',
           willChange: 'opacity',
         }}
       >

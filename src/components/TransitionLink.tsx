@@ -1,6 +1,6 @@
 'use client';
 
-import { useRouter } from 'next/navigation';
+import { useRouter, usePathname } from 'next/navigation';
 import { MouseEvent, useState } from 'react';
 
 interface TransitionLinkProps {
@@ -12,12 +12,15 @@ interface TransitionLinkProps {
 
 export default function TransitionLink({ href, className, style, children }: TransitionLinkProps) {
   const router = useRouter();
+  const pathname = usePathname();
   const [isNavigating, setIsNavigating] = useState(false);
 
   const handleClick = (e: MouseEvent<HTMLAnchorElement>) => {
     e.preventDefault();
     
-    if (isNavigating) return;
+    // Don't navigate if we're already on this page
+    if (pathname === href || isNavigating) return;
+    
     setIsNavigating(true);
 
     // Create overlay for smooth transition
@@ -29,7 +32,7 @@ export default function TransitionLink({ href, className, style, children }: Tra
     overlay.style.height = '100%';
     overlay.style.backgroundColor = 'var(--background, #000)';
     overlay.style.opacity = '0';
-    overlay.style.transition = 'opacity 0.4s ease-in-out';
+    overlay.style.transition = 'opacity 0.3s ease-in-out';
     overlay.style.zIndex = '9999';
     overlay.style.pointerEvents = 'none';
     document.body.appendChild(overlay);
@@ -43,8 +46,8 @@ export default function TransitionLink({ href, className, style, children }: Tra
     setTimeout(() => {
       router.push(href);
       
-      // Keep the overlay dark for longer to allow new content to render
-      // This works with TransitionProvider's 150ms delay
+      // Wait for navigation to complete before removing overlay
+      // This prevents the flash of old content
       setTimeout(() => {
         overlay.style.opacity = '0';
         // Remove overlay after fade-out completes
@@ -53,9 +56,9 @@ export default function TransitionLink({ href, className, style, children }: Tra
             document.body.removeChild(overlay);
           }
           setIsNavigating(false);
-        }, 500);
-      }, 200);
-    }, 400);
+        }, 400);
+      }, 300);
+    }, 300);
   };
 
   return (
