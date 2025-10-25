@@ -14,7 +14,7 @@ interface TransitionLinkProps {
 export default function TransitionLink({ href, className, style, children }: TransitionLinkProps) {
   const router = useRouter();
   const pathname = usePathname();
-  const { startTransition } = useTransition();
+  const { startTransition, setShowLoading } = useTransition();
   const [isNavigating, setIsNavigating] = useState(false);
 
   const handleClick = (e: MouseEvent<HTMLAnchorElement>) => {
@@ -51,8 +51,15 @@ export default function TransitionLink({ href, className, style, children }: Tra
     setTimeout(() => {
       router.push(href);
 
-      // Wait for navigation to complete before removing overlay
-      // This prevents the flash of old content
+      // Show loading indicator after overlay fade-in completes
+      // (overlay takes 300ms to fade in, then 300ms before we show loading)
+      setTimeout(() => {
+        setShowLoading(true);
+      }, 300);
+
+      // Wait for loading indicator to display and fade out
+      // Loading shows at ~600ms, displays for 2 seconds, then fades out (300ms)
+      // Total: 600 + 2000 + 300 = 2900ms before overlay can fade out
       setTimeout(() => {
         overlay.style.opacity = '0';
         // Remove overlay after fade-out completes
@@ -61,8 +68,8 @@ export default function TransitionLink({ href, className, style, children }: Tra
             document.body.removeChild(overlay);
           }
           setIsNavigating(false);
-        }, 400);
-      }, 300);
+        }, 300);
+      }, 2600);
     }, 300);
   };
 

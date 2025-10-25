@@ -2,10 +2,12 @@
 
 import { createContext, useContext, useState, useEffect, useRef } from 'react';
 import { usePathname } from 'next/navigation';
+import LoadingTerminal from './LoadingTerminal';
 
 interface TransitionContextType {
   isTransitioning: boolean;
   startTransition: () => void;
+  setShowLoading: (show: boolean) => void;
 }
 
 const TransitionContext = createContext<TransitionContextType | undefined>(undefined);
@@ -13,8 +15,47 @@ const TransitionContext = createContext<TransitionContextType | undefined>(undef
 export function TransitionProvider({ children }: { children: React.ReactNode }) {
   const [isTransitioning, setIsTransitioning] = useState(false);
   const [displayContent, setDisplayContent] = useState(true);
+  const [showLoading, setShowLoading] = useState(false);
+  const [loadingStartTime, setLoadingStartTime] = useState<number | null>(null);
+  const [shouldFadeOutLoading, setShouldFadeOutLoading] = useState(false);
   const pathname = usePathname();
   const previousPathname = useRef(pathname);
+
+  // Track when loading starts
+  useEffect(() => {
+    if (showLoading && !loadingStartTime) {
+      setLoadingStartTime(Date.now());
+      setShouldFadeOutLoading(false);
+    }
+  }, [showLoading, loadingStartTime]);
+
+  // Check if 2 seconds have passed and fade out loading when content is ready
+  useEffect(() => {
+    if (!showLoading || !loadingStartTime) return;
+
+    const timer = setInterval(() => {
+      const elapsedTime = Date.now() - loadingStartTime;
+      if (elapsedTime >= 2000) {
+        setShouldFadeOutLoading(true);
+        clearInterval(timer);
+      }
+    }, 50);
+
+    return () => clearInterval(timer);
+  }, [showLoading, loadingStartTime]);
+
+  // Hide loading when fade-out completes
+  useEffect(() => {
+    if (!shouldFadeOutLoading) return;
+
+    const timer = setTimeout(() => {
+      setShowLoading(false);
+      setLoadingStartTime(null);
+      setShouldFadeOutLoading(false);
+    }, 300); // Wait for fade-out transition to complete
+
+    return () => clearTimeout(timer);
+  }, [shouldFadeOutLoading]);
 
   useEffect(() => {
     // Only trigger transition if pathname actually changed
@@ -40,7 +81,8 @@ export function TransitionProvider({ children }: { children: React.ReactNode }) 
   };
 
   return (
-    <TransitionContext.Provider value={{ isTransitioning, startTransition }}>
+    <TransitionContext.Provider value={{ isTransitioning, startTransition, setShowLoading }}>
+      <LoadingTerminal isVisible={showLoading} shouldFadeOut={shouldFadeOutLoading} />
       <div
         style={{
           opacity: displayContent ? 1 : 0,
