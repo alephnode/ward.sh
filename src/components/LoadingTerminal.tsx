@@ -70,7 +70,10 @@ export default function LoadingTerminal({ isVisible, shouldFadeOut }: LoadingTer
         whiteSpace: 'nowrap',
       }}
     >
-      <span>{`> ${displayText}${showCursor ? '█' : ' '}`}</span>
+      <span style={{ display: 'inline-block' }}>
+        {`> ${displayText}`}
+        <span style={{ visibility: showCursor ? 'visible' : 'hidden' }}>█</span>
+      </span>
     </div>
   );
 }
