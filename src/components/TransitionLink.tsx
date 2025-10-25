@@ -2,6 +2,7 @@
 
 import { useRouter, usePathname } from 'next/navigation';
 import { MouseEvent, useState } from 'react';
+import { useTransition } from './TransitionProvider';
 
 interface TransitionLinkProps {
   href: string;
@@ -13,15 +14,19 @@ interface TransitionLinkProps {
 export default function TransitionLink({ href, className, style, children }: TransitionLinkProps) {
   const router = useRouter();
   const pathname = usePathname();
+  const { startTransition } = useTransition();
   const [isNavigating, setIsNavigating] = useState(false);
 
   const handleClick = (e: MouseEvent<HTMLAnchorElement>) => {
     e.preventDefault();
-    
+
     // Don't navigate if we're already on this page
     if (pathname === href || isNavigating) return;
-    
+
     setIsNavigating(true);
+
+    // Signal to TransitionProvider to hide content BEFORE navigation
+    startTransition();
 
     // Create overlay for smooth transition
     const overlay = document.createElement('div');
@@ -45,7 +50,7 @@ export default function TransitionLink({ href, className, style, children }: Tra
     // Navigate after fade completes
     setTimeout(() => {
       router.push(href);
-      
+
       // Wait for navigation to complete before removing overlay
       // This prevents the flash of old content
       setTimeout(() => {

@@ -21,29 +21,27 @@ export function TransitionProvider({ children }: { children: React.ReactNode }) 
     if (previousPathname.current === pathname) {
       return;
     }
-    
+
     previousPathname.current = pathname;
-    
-    // Hide content briefly to allow new content to render
-    setIsTransitioning(false);
-    setDisplayContent(false);
-    
-    // Show content after a brief delay
-    // This works in coordination with TransitionLink's overlay timing
-    const timer = setTimeout(() => {
+
+    // When transitioning, the content should already be hidden by TransitionLink
+    // before the URL changes. When we detect the pathname change, show the new content.
+    // The overlay will fade out, revealing the new content.
+    if (isTransitioning) {
+      // Show content immediately since TransitionLink's overlay is still covering the screen
       setDisplayContent(true);
-    }, 50);
-    
-    return () => clearTimeout(timer);
-  }, [pathname]);
+    }
+  }, [pathname, isTransitioning]);
 
   const startTransition = () => {
+    // Hide content before navigation happens
+    setDisplayContent(false);
     setIsTransitioning(true);
   };
 
   return (
     <TransitionContext.Provider value={{ isTransitioning, startTransition }}>
-      <div 
+      <div
         style={{
           opacity: displayContent ? 1 : 0,
           transition: 'opacity 0.3s ease-in-out',
