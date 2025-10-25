@@ -66,6 +66,16 @@
   line-height: 1;
   cursor: pointer;
   transition: opacity 0.2s ease;
+  font-family: monospace;
+  overflow: hidden;
+  white-space: nowrap;
+  display: inline-block;
+  animation: typeOut 0.4s steps(10, end) forwards;
+}
+
+.logo::before {
+  content: '> ';
+  margin-right: 0.1em;
 }
 
 .ward {
@@ -76,6 +86,34 @@
 .sh {
   color: #333333;
   font-weight: 300;
+  display: inline-block;
+  position: relative;
+}
+
+/* Blinking cursor after .sh */
+.sh::after {
+  content: '█';
+  margin-left: 0.1em;
+  display: inline-block;
+  animation: blink 1.06s steps(1, start) 0.4s infinite;
+}
+
+@keyframes typeOut {
+  0% {
+    clip-path: polygon(0% 0%, 0% 0%, 0% 100%, 0% 100%);
+  }
+  100% {
+    clip-path: polygon(0% 0%, 100% 0%, 100% 100%, 0% 100%);
+  }
+}
+
+@keyframes blink {
+  0%, 50% {
+    visibility: visible;
+  }
+  51%, 100% {
+    visibility: hidden;
+  }
 }
 
 .navLink {
@@ -149,10 +187,14 @@
 
 /* Dark mode */
 @media (prefers-color-scheme: dark) {
+  .logo {
+    font-family: monospace;
+  }
+
   .ward {
     color: #999999;
   }
-  
+
   .sh {
     color: #cccccc;
   }
