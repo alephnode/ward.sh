@@ -6,14 +6,6 @@ import styles from '../section.module.css';
 import galleryStyles from './gallery.module.css';
 import Navbar from '@/components/Navbar';
 
-// Get all image filenames
-const imageFiles = [
-  '01.webp', '02.webp', '03.webp', '05.webp', '05a.webp',
-  '06.webp', '08.webp', '10.webp', '12.webp', '13.webp',
-  '14a.webp', '15a.webp', '17a.webp', '19a.webp', '20a.webp',
-  '22a.webp', '24a.webp', '27a.webp', '28a.webp', '33a.webp'
-];
-
 // Fisher-Yates shuffle algorithm
 function shuffleArray<T>(array: T[]): T[] {
   const shuffled = [...array];
@@ -27,10 +19,28 @@ function shuffleArray<T>(array: T[]): T[] {
 export default function Visual() {
   const [selectedImage, setSelectedImage] = useState<string | null>(null);
   const [shuffledImages, setShuffledImages] = useState<string[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
 
-  // Shuffle images on mount
+  // Fetch and shuffle images on mount
   useEffect(() => {
-    setShuffledImages(shuffleArray(imageFiles));
+    const fetchImages = async () => {
+      try {
+        const response = await fetch('/api/images');
+        if (!response.ok) {
+          throw new Error('Failed to fetch images');
+        }
+        const data = await response.json();
+        setShuffledImages(shuffleArray(data.images));
+      } catch (error) {
+        console.error('Error fetching images:', error);
+        // Fallback to empty array if API fails
+        setShuffledImages([]);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    fetchImages();
   }, []);
 
   // Handle ESC key to close modal
@@ -61,25 +71,31 @@ export default function Visual() {
       </header>
       <div className={styles.container}>
         <div className={galleryStyles.galleryContainer}>
-          <div className={galleryStyles.gallery}>
-            {shuffledImages.map((image, index) => (
-              <div
-                key={`${image}-${index}`}
-                className={galleryStyles.imageWrapper}
-                onClick={() => setSelectedImage(image)}
-              >
-                <Image
-                  src={`/slideshow-images/${image}`}
-                  alt={`Film photo ${index + 1}`}
-                  fill
-                  sizes="(max-width: 640px) 100vw, (max-width: 900px) 50vw, (max-width: 1200px) 33vw, 25vw"
-                  className={galleryStyles.thumbnail}
-                  placeholder="blur"
-                  blurDataURL="data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/2wBDAAYEBQYFBAYGBQYHBwYIChAKCgkJChQODwwQFxQYGBcUFhYaHSUfGhsjHBYWICwgIyYnKSopGR8tMC0oMCUoKSj/2wBDAQcHBwoIChMKChMoGhYaKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCj/wAARCAAKAAoDASIAAhEBAxEB/8QAFQABAQAAAAAAAAAAAAAAAAAAAAf/xAAhEAACAQMDBQAAAAAAAAAAAAABAgMABAUGIWEREiMxUf/EABUBAQEAAAAAAAAAAAAAAAAAAAMF/8QAGhEAAgIDAAAAAAAAAAAAAAAAAAECEgMRkf/aAAwDAQACEQMRAD8AltJagyeH0AthI5xdrLcNM91BF5pX2HaH9bcfaSXWGaRmknyJckliyjqTzSlT54b6bk+h0R//2Q=="
-                />
-              </div>
-            ))}
-          </div>
+          {isLoading ? (
+            <div className={galleryStyles.loadingContainer}>
+              <p>Loading images...</p>
+            </div>
+          ) : (
+            <div className={galleryStyles.gallery}>
+              {shuffledImages.map((image, index) => (
+                <div
+                  key={`${image}-${index}`}
+                  className={galleryStyles.imageWrapper}
+                  onClick={() => setSelectedImage(image)}
+                >
+                  <Image
+                    src={`/slideshow-images/${image}`}
+                    alt={`Film photo ${index + 1}`}
+                    fill
+                    sizes="(max-width: 640px) 100vw, (max-width: 900px) 50vw, (max-width: 1200px) 33vw, 25vw"
+                    className={galleryStyles.thumbnail}
+                    placeholder="blur"
+                    blurDataURL="data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/2wBDAAYEBQYFBAYGBQYHBwYIChAKCgkJChQODwwQFxQYGBcUFhYaHSUfGhsjHBYWICwgIyYnKSopGR8tMC0oMCUoKSj/2wBDAQcHBwoIChMKChMoGhYaKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCj/wAARCAAKAAoDASIAAhEBAxEB/8QAFQABAQAAAAAAAAAAAAAAAAAAAAf/xAAhEAACAQMDBQAAAAAAAAAAAAABAgMABAUGIWEREiMxUf/EABUBAQEAAAAAAAAAAAAAAAAAAAMF/8QAGhEAAgIDAAAAAAAAAAAAAAAAAAECEgMRkf/aAAwDAQACEQMRAD8AltJagyeH0AthI5xdrLcNM91BF5pX2HaH9bcfaSXWGaRmknyJckliyjqTzSlT54b6bk+h0R//2Q=="
+                  />
+                </div>
+              ))}
+            </div>
+          )}
         </div>
       </div>
 
