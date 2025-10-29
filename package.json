@@ -9,10 +9,12 @@
     "lint": "eslint"
   },
   "dependencies": {
+    "@types/react-window": "^1.8.8",
     "gray-matter": "^4.0.3",
     "next": "16.0.0",
     "react": "19.2.0",
     "react-dom": "19.2.0",
+    "react-window": "^1.8.11",
     "remark": "^15.0.1",
     "remark-html": "^16.0.1"
   },
