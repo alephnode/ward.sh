@@ -6,7 +6,9 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "eslint"
+    "lint": "eslint",
+    "convert-images:webp": "npx sharp -i \"public/slideshow-images/*.jpg\" -o public/slideshow-images -f webp",
+    "delete-images:jpg": "find ./public/slideshow-images -type f -name \"*.jpg\" -delete"
   },
   "dependencies": {
     "gray-matter": "^4.0.3",
