@@ -11,7 +11,7 @@ interface ArticlePageProps {
   }>;
 }
 
-const archiveArticlesDirectory = path.join(process.cwd(), 'src/app/textual/archive/content');
+const archiveArticlesDirectory = path.join(process.cwd(), 'src/app/writing/archive/content');
 
 export async function generateStaticParams() {
   const slugs = getArticleSlugs(archiveArticlesDirectory);
@@ -29,7 +29,7 @@ export default async function ArticlePage({ params }: ArticlePageProps) {
       </header>
       <div className={styles.container}>
         <article className={articleStyles.article}>
-          <TransitionLink href="/textual/archive" className={articleStyles.topBackLink}>
+          <TransitionLink href="/writing/archive" className={articleStyles.topBackLink}>
             ← Back to archive
           </TransitionLink>
           <header className={articleStyles.articleHeader}>
@@ -50,7 +50,7 @@ export default async function ArticlePage({ params }: ArticlePageProps) {
             dangerouslySetInnerHTML={{ __html: article.content }}
           />
           <footer className={articleStyles.footer}>
-            <TransitionLink href="/textual/archive" className={articleStyles.backLink}>
+            <TransitionLink href="/writing/archive" className={articleStyles.backLink}>
               ← Back to archive
             </TransitionLink>
           </footer>

@@ -16,7 +16,7 @@ function shuffleArray<T>(array: T[]): T[] {
   return shuffled;
 }
 
-export default function Visual() {
+export default function Photography() {
   const [selectedImage, setSelectedImage] = useState<string | null>(null);
   const [shuffledImages, setShuffledImages] = useState<string[]>([]);
   const [isLoading, setIsLoading] = useState(true);
@@ -83,7 +83,7 @@ export default function Visual() {
   return (
     <main className={styles.section}>
       <header className={styles.header}>
-        <Navbar activePage="visual" />
+        <Navbar activePage="photography" />
       </header>
       <div className={styles.container}>
         <div className={galleryStyles.galleryContainer}>

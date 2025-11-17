@@ -1,15 +1,18 @@
 import styles from '../section.module.css';
 import Navbar from '@/components/Navbar';
+import TransitionLink from '@/components/TransitionLink';
 
-export default function Audible() {
+export default function Writing() {
   return (
     <main className={styles.section}>
       <header className={styles.header}>
-        <Navbar activePage="audible" />
+        <Navbar activePage="writing" />
       </header>
       <div className={styles.container}>
         <div className={styles.content}>
-          coming soon
+          <TransitionLink href="/writing/archive" style={{ textDecoration: 'underline' }}>
+            archive
+          </TransitionLink>
         </div>
       </div>
     </main>

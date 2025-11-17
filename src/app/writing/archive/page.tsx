@@ -5,7 +5,7 @@ import ArchiveList from './archive-list';
 import path from 'path';
 
 export default function Archive() {
-  const archiveArticlesDirectory = path.join(process.cwd(), 'src/app/textual/archive/content');
+  const archiveArticlesDirectory = path.join(process.cwd(), 'src/app/writing/archive/content');
   const archiveArticles = getAllArticles(archiveArticlesDirectory);
 
   return (

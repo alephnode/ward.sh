@@ -2,7 +2,7 @@ import TransitionLink from './TransitionLink';
 import styles from './Navbar.module.css';
 
 type NavbarVariant = 'hero' | 'header';
-type ActivePage = 'textual' | 'visual' | 'audible' | null;
+type ActivePage = 'writing' | 'photography' | 'music' | null;
 
 interface NavbarProps {
   variant?: NavbarVariant;
@@ -24,31 +24,31 @@ export default function Navbar({ variant = 'header', activePage = null }: Navbar
     <div className={containerClass}>
       {isHero ? logoContent : <TransitionLink href="/">{logoContent}</TransitionLink>}
       <nav className={styles.nav}>
-        {activePage === 'textual' ? (
+        {activePage === 'writing' ? (
           <span className={`${styles.navLink} ${styles.navLinkActive}`}>
-            textual
+            writing
           </span>
         ) : (
-          <TransitionLink href="/textual" className={styles.navLink}>
-            textual
+          <TransitionLink href="/writing" className={styles.navLink}>
+            writing
           </TransitionLink>
         )}
-        {activePage === 'visual' ? (
+        {activePage === 'photography' ? (
           <span className={`${styles.navLink} ${styles.navLinkActive}`}>
-            visual
+            photography
           </span>
         ) : (
-          <TransitionLink href="/visual" className={styles.navLink}>
-            visual
+          <TransitionLink href="/photography" className={styles.navLink}>
+            photography
           </TransitionLink>
         )}
-        {activePage === 'audible' ? (
+        {activePage === 'music' ? (
           <span className={`${styles.navLink} ${styles.navLinkActive}`}>
-            audible
+            music
           </span>
         ) : (
-          <TransitionLink href="/audible" className={styles.navLink}>
-            audible
+          <TransitionLink href="/music" className={styles.navLink}>
+            music
           </TransitionLink>
         )}
       </nav>

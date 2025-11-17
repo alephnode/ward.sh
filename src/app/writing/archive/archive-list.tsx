@@ -19,7 +19,7 @@ export default function ArchiveList({ articles }: ArchiveListProps) {
           }}
         >
           <TransitionLink
-            href={`/textual/archive/${article.slug}`}
+            href={`/writing/archive/${article.slug}`}
             style={{
               textDecoration: 'none',
               color: 'inherit',
