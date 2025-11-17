@@ -114,15 +114,31 @@ export async function getArticle(directory: string, slug: string): Promise<Artic
       // Now extract the complete HTML block
       const tagName = blockLevelMatch[1];
       let htmlBlock = lines[i];
-      i++;
-
+      
       // For tags like hr and br that are self-closing, we're done
       if (line.match(/^<(hr|br)\b[^>]*\/?\s*>$/i)) {
         parts.push({ type: 'html', content: htmlBlock });
+        i++;
         continue;
       }
 
-      // For opening tags, find the closing tag
+      // Check if the closing tag is already on the same line (self-contained HTML block)
+      const closingTagRegex = new RegExp(`</${tagName}>`, 'gi');
+      if (line.match(closingTagRegex)) {
+        // Count opening and closing tags to ensure they balance on this line
+        const openCount = (line.match(new RegExp(`<${tagName}\\b`, 'gi')) || []).length;
+        const closeCount = (line.match(closingTagRegex) || []).length;
+        
+        // If tags are balanced on this line, it's self-contained
+        if (openCount === closeCount) {
+          parts.push({ type: 'html', content: htmlBlock });
+          i++;
+          continue;
+        }
+      }
+
+      // For multi-line opening tags, find the closing tag
+      i++; // Move to next line since we've already captured the opening line
       let closingTagFound = false;
       let depth = 1;
 
@@ -186,3 +202,4 @@ export async function getArticle(directory: string, slug: string): Promise<Artic
     content: htmlContent,
   };
 }
+
