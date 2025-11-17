@@ -2,7 +2,10 @@ import fs from 'fs';
 import path from 'path';
 import matter from 'gray-matter';
 import { remark } from 'remark';
-import remarkHtml from 'remark-html';
+import remarkRehype from 'remark-rehype';
+import rehypeRaw from 'rehype-raw';
+import rehypeHighlight from 'rehype-highlight';
+import rehypeStringify from 'rehype-stringify';
 
 export interface ArticleMetadata {
   slug: string;
@@ -152,8 +155,15 @@ export async function getArticle(directory: string, slug: string): Promise<Artic
     parts.push({ type: 'markdown', content: currentMarkdown });
   }
 
-  // Process markdown parts through remark
-  const remarkProcessor = remark().use(remarkHtml);
+  // Process markdown parts through remark with syntax highlighting
+  // allowDangerousHtml tells remarkRehype to preserve raw HTML
+  // rehypeRaw then parses the raw HTML into proper AST nodes
+  const remarkProcessor = remark()
+    .use(remarkRehype, { allowDangerousHtml: true })
+    .use(rehypeRaw)
+    .use(rehypeHighlight)
+    .use(rehypeStringify);
+
   let processedHtml = '';
 
   for (const part of parts) {

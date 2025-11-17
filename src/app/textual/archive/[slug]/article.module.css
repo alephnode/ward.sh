@@ -99,7 +99,6 @@
 }
 
 .content pre {
-  background-color: var(--border);
   padding: 1rem;
   border-radius: 4px;
   overflow-x: auto;

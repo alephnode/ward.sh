@@ -5,7 +5,7 @@ date: '2020-05-07'
 
 <div id="img-container">
 <img id="jest-img" src="images/jest.png">
-</div
+</div>
 
 A few months have passed since my last article. During that time, I've been tending to a new home, new role, and new workload.
 
