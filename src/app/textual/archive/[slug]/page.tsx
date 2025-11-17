@@ -29,6 +29,9 @@ export default async function ArticlePage({ params }: ArticlePageProps) {
       </header>
       <div className={styles.container}>
         <article className={articleStyles.article}>
+          <TransitionLink href="/textual/archive" className={articleStyles.topBackLink}>
+            ← Back to archive
+          </TransitionLink>
           <header className={articleStyles.articleHeader}>
             <h1 className={articleStyles.title}>{article.title}</h1>
             <time
