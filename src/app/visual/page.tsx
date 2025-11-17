@@ -43,17 +43,33 @@ export default function Visual() {
     fetchImages();
   }, []);
 
-  // Handle ESC key to close modal
+  // Handle keyboard navigation (ESC to close, Arrow keys to navigate)
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
-      if (e.key === 'Escape' && selectedImage) {
+      if (!selectedImage) return;
+
+      if (e.key === 'Escape') {
         setSelectedImage(null);
+      } else if (e.key === 'ArrowLeft' || e.key === 'ArrowRight') {
+        const currentIndex = shuffledImages.indexOf(selectedImage);
+        if (currentIndex === -1) return;
+
+        let nextIndex: number;
+        if (e.key === 'ArrowLeft') {
+          // Go to previous image, wrap around to last if at start
+          nextIndex = currentIndex === 0 ? shuffledImages.length - 1 : currentIndex - 1;
+        } else {
+          // Go to next image, wrap around to first if at end
+          nextIndex = currentIndex === shuffledImages.length - 1 ? 0 : currentIndex + 1;
+        }
+
+        setSelectedImage(shuffledImages[nextIndex]);
       }
     };
 
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [selectedImage]);
+  }, [selectedImage, shuffledImages]);
 
   // Prevent body scroll when modal is open
   useEffect(() => {
