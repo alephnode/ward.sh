@@ -71,15 +71,33 @@ export async function getArticle(directory: string, slug: string): Promise<Artic
   let htmlContent = content.replace(/\.?\/?images\//g, '/archive-images/');
 
   // Split content into lines to identify standalone HTML blocks
+  // We need to be careful to NOT extract HTML blocks that are inside markdown code blocks
   const lines = htmlContent.split('\n');
   const parts: Array<{ type: 'html' | 'markdown', content: string }> = [];
   let currentMarkdown = '';
+  let inCodeBlock = false;
   let i = 0;
 
   while (i < lines.length) {
     const line = lines[i].trim();
 
+    // Check if we're entering or exiting a code block
+    if (line.startsWith('```') || line.startsWith('~~~')) {
+      inCodeBlock = !inCodeBlock;
+      currentMarkdown += lines[i] + '\n';
+      i++;
+      continue;
+    }
+
+    // If we're inside a code block, just accumulate the line as markdown
+    if (inCodeBlock) {
+      currentMarkdown += lines[i] + '\n';
+      i++;
+      continue;
+    }
+
     // Check if this is a standalone HTML block (div, p, blockquote, etc. on its own line)
+    // Only do this if we're NOT in a code block
     const blockLevelMatch = line.match(/^<(address|article|aside|blockquote|details|dialog|dd|div|dl|dt|fieldset|figcaption|figure|footer|form|h1|h2|h3|h4|h5|h6|header|hgroup|hr|li|main|nav|ol|p|pre|section|table|ul|script|style)\b/i);
 
     if (blockLevelMatch) {
