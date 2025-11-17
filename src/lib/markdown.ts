@@ -70,42 +70,81 @@ export async function getArticle(directory: string, slug: string): Promise<Artic
   // This handles both markdown image syntax and HTML img tags
   let htmlContent = content.replace(/\.?\/?images\//g, '/archive-images/');
 
-  // Process markdown to HTML, but preserve the raw HTML that's already in the content
-  // We need to do this carefully to not lose the HTML blocks
-  // Split content by HTML blocks and process only the markdown parts
-  const htmlBlockRegex = /<[^>]+>[\s\S]*?<\/[^>]+>|<[^>]+\/>/g;
+  // Split content into lines to identify standalone HTML blocks
+  const lines = htmlContent.split('\n');
   const parts: Array<{ type: 'html' | 'markdown', content: string }> = [];
-  let lastIndex = 0;
-  let match;
+  let currentMarkdown = '';
+  let i = 0;
 
-  while ((match = htmlBlockRegex.exec(htmlContent)) !== null) {
-    // Add markdown content before this HTML block
-    if (match.index > lastIndex) {
-      parts.push({ type: 'markdown', content: htmlContent.substring(lastIndex, match.index) });
+  while (i < lines.length) {
+    const line = lines[i].trim();
+
+    // Check if this is a standalone HTML block (div, p, blockquote, etc. on its own line)
+    const blockLevelMatch = line.match(/^<(address|article|aside|blockquote|details|dialog|dd|div|dl|dt|fieldset|figcaption|figure|footer|form|h1|h2|h3|h4|h5|h6|header|hgroup|hr|li|main|nav|ol|p|pre|section|table|ul|script|style)\b/i);
+
+    if (blockLevelMatch) {
+      // This is a block-level HTML element
+      // First, add any accumulated markdown
+      if (currentMarkdown.trim()) {
+        parts.push({ type: 'markdown', content: currentMarkdown });
+        currentMarkdown = '';
+      }
+
+      // Now extract the complete HTML block
+      const tagName = blockLevelMatch[1];
+      let htmlBlock = lines[i];
+      i++;
+
+      // For tags like hr and br that are self-closing, we're done
+      if (line.match(/^<(hr|br)\b[^>]*\/?\s*>$/i)) {
+        parts.push({ type: 'html', content: htmlBlock });
+        continue;
+      }
+
+      // For opening tags, find the closing tag
+      let closingTagFound = false;
+      let depth = 1;
+
+      while (i < lines.length && !closingTagFound) {
+        htmlBlock += '\n' + lines[i];
+
+        // Count opening and closing tags of the same type
+        const openCount = (lines[i].match(new RegExp(`<${tagName}\\b`, 'gi')) || []).length;
+        const closeCount = (lines[i].match(new RegExp(`</${tagName}>`, 'gi')) || []).length;
+
+        depth += openCount - closeCount;
+
+        if (depth === 0) {
+          closingTagFound = true;
+        }
+
+        i++;
+      }
+
+      parts.push({ type: 'html', content: htmlBlock });
+    } else {
+      // This is markdown content
+      currentMarkdown += lines[i] + '\n';
+      i++;
     }
-    // Add HTML block as-is
-    parts.push({ type: 'html', content: match[0] });
-    lastIndex = match.index + match[0].length;
   }
 
-  // Add any remaining markdown content
-  if (lastIndex < htmlContent.length) {
-    parts.push({ type: 'markdown', content: htmlContent.substring(lastIndex) });
+  // Add any remaining markdown
+  if (currentMarkdown.trim()) {
+    parts.push({ type: 'markdown', content: currentMarkdown });
   }
-
-  // Create remark processor once, outside the loop
-  const remarkProcessor = remark().use(remarkHtml);
 
   // Process markdown parts through remark
+  const remarkProcessor = remark().use(remarkHtml);
   let processedHtml = '';
+
   for (const part of parts) {
     if (part.type === 'html') {
       processedHtml += part.content;
     } else {
-      // Only process markdown if there's actual markdown content
       if (part.content.trim()) {
-        const processedContent = await remarkProcessor.process(part.content);
-        processedHtml += processedContent.toString();
+        const processed = await remarkProcessor.process(part.content);
+        processedHtml += processed.toString();
       }
     }
   }
